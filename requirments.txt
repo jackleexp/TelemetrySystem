@@ -1,0 +1,2 @@
+construct==2.9.45
+elasticsearch>=6.0.0,<7.0.0
