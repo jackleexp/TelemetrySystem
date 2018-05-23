@@ -9,7 +9,7 @@ import datetime
 
 base_time = datetime.datetime(2018, 5, 1, 0, 0, 0)
 
-es = Elasticsearch()
+es = Elasticsearch(http_auth=('elastic', '0zO8MRnXd0oMK98Sihd7'))
 
 es.indices.create(index='3s_tm_index', ignore=400)
 
