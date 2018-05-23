@@ -4,7 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a33afe41-2c6a-4040-badb-2c78e1df4ec6</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>TelemetrySystem.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,7 +25,6 @@
     <Compile Include="agent.py" />
     <Compile Include="apid.py" />
     <Compile Include="main.py" />
-    <Compile Include="TelemetrySystem.py" />
     <Compile Include="test.py" />
     <Compile Include="vcdu_parser.py" />
   </ItemGroup>

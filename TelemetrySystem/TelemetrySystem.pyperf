@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ProfilingTarget xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProjectTarget>
+    <TargetProject>a33afe41-2c6a-4040-badb-2c78e1df4ec6</TargetProject>
+    <FriendlyName>TelemetrySystem</FriendlyName>
+  </ProjectTarget>
+</ProfilingTarget>
