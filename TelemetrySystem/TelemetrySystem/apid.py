@@ -4,7 +4,7 @@ from construct import *
 
 all_apid = {
 	0x0401:{
-	"len":139 + 6,
+	"len":135 + 6,
 	"struct":
 		Struct(
 		"byte1" / BitStruct(
