@@ -5,11 +5,11 @@ import socket
 import time
 import datetime
 
-SERIALPORT = "COM3"
+SERIALPORT = "COM12"
 BAUDRATE = 9600
 parity = serial.PARITY_NONE
 
-server_ip = "127.0.0.1"
+server_ip = "192.168.1.106"
 server_port = 60060
 
 ser = serial.serial_for_url(SERIALPORT, do_not_open=True)
@@ -41,6 +41,9 @@ while True:
         pass # XXX not available on windows
 
 
+    save_file_name = datetime.datetime.now().strftime("data/%Y-%m-%d_%H%M%S.txt")
+
+    save_file = open(save_file_name, "a+")
     try:
         while True:
             try:
@@ -48,6 +51,7 @@ while True:
                 if not data:
                     continue
                 sys.stderr.write("{}:Recv one pack from serial\n".format(datetime.datetime.now()))
+                save_file.write("{}:{}\n".format(datetime.datetime.now(), data.encode('hex')))
                 client_socket.send(data)
             except serial.SerialException as msg:
                 sys.stderr.write("ERROR: {} \n".format(msg))
@@ -62,4 +66,5 @@ while True:
     finally:
         sys.stderr.write("Disconnected\n")
         client_socket.close()
+        save_file.close()
     
