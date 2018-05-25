@@ -1,6 +1,7 @@
 #coding:utf-8
 
 import socket
+import math
 import traceback
 import datetime
 from vcdu_parser import *
@@ -14,6 +15,31 @@ es = Elasticsearch(http_auth=('elastic', '0zO8MRnXd0oMK98Sihd7'))
 
 es.indices.create(index='3s_tm_index', ignore=400)
 
+def transfer(data, method):
+    try:
+        x = data
+        if method.startswith("x") or method.startswith("("):
+            return str(eval(method))
+        elif method.startswith("DISPLAY"):
+            return method[7:] % x
+        elif method.startswith("SWITCH"):
+            all_case = method[6:].split(",")
+            enum_value = {}
+            for case in all_case:
+                enum_value[case.split(":")[0]] = case.split(":")[1]
+            return enum_value[hex(data)]
+        elif method.startswith("'TRUE'"):
+            return eval(method)
+        elif method == "":
+            return "0"
+        elif method == "DT_TEMP":
+            e = 2.718281828459
+            r = 10000.0 * (0.125 + x) / (255.875 - x)
+            T = math.pow((1.0 / 298.15 + 1.0 / 4100.0 * math.log(r / 5013.9, e)), -1.0) - 273.15
+            return str(T)
+    except Exception as e:
+        traceback.print_exc()
+
 
 def send_data_to_elastic(key, value, time):
     if key == "_io" or key == "reserve":
@@ -24,7 +50,8 @@ def send_data_to_elastic(key, value, time):
     single_data["satellite_time"] = (base_time + datetime.timedelta(seconds=time))
     single_data["name"] = key
     single_data["value"] = value
-    #print single_data
+    single_data["show"] = transfer(value, all_apid[0x401]["transform"][key])
+    #print ("%s:%s" % (single_data["name"], single_data["show"]))
     es.index(index="3s_tm_index",doc_type="telemetry",body=single_data)
 
 
@@ -100,14 +127,17 @@ if __name__ == "__main__":
                         epdu_head = vcdu_parsered_data.mpdu.data[first_epdu_ptr:first_epdu_ptr + 6]
                         epdu_data = vcdu_parsered_data.mpdu.data[first_epdu_ptr+6:first_epdu_ptr + first_epdu_len]
 
-                    if (len(epdu_data) + 6) == first_epdu_len:
-                        #如果本次epdu拿到的数据全，则解析
-                        print(u"本次epdu拿到的数据全，则解析")
-                        parse_epdu(epdu_data, first_epdu_apid, time)
+                    if first_epdu_apid == 0x401:
+                        if (len(epdu_data) + 6) == first_epdu_len:
+                            #如果本次epdu拿到的数据全，则解析
+                            print(u"本次epdu拿到的数据全，解析")
+                            parse_epdu(epdu_data, first_epdu_apid, time)
+                        else:
+                            #数据不全，暂存
+                            print(u"数据不全，暂存%d字节" % len(epdu_data))
+                            last_remain_data = epdu_data
                     else:
-                        #数据不全，暂存
-                        print(u"数据不全，暂存%d字节" % len(epdu_data))
-                        last_remain_data = epdu_data
+                        print("APID is not 0x401")
                     
                     last_time = time
                     last_vc_num = curr_vc_num
